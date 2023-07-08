@@ -40,4 +40,5 @@ def delete_topics(topic_names):
         print(e)
 
 if __name__ == "__main__":
+    create_topics(topics)
     print(admin_client.list_topics())
