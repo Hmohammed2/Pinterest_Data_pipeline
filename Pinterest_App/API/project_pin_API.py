@@ -6,8 +6,6 @@ from kafka import KafkaProducer
 
 app = FastAPI()
 
-
-
 class Data(BaseModel):
     category: str
     index: int
@@ -21,10 +19,18 @@ class Data(BaseModel):
     downloaded: int
     save_location: str
 
+# Create Producer to send message to a kafka topic
+kafka_producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    client_id="Pinterest data producer",
+    value_serializer=lambda mlmessage: dumps(mlmessage).encode("ascii")
+) 
+
 
 @app.post("/pin/")
 def get_db_row(item: Data):
     data = dict(item)
+    kafka_producer.send(topic="Pinterest_data", value=data)
     return item
 
 

@@ -7,7 +7,7 @@ admin_client = KafkaAdminClient(
     client_id = "Kafka-Administrator"
 )
 
-topics = ["topic1", "topic2", "topic3"]
+topics = ["Pinterest_data"]
 
 def create_topics(topic_names):
     existing_topic_list = KafkaConsumer().topics()

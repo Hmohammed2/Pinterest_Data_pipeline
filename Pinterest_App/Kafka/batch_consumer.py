@@ -1,10 +1,15 @@
-from kafka import KafkaConsumer
-from json import loads
 import json
-import boto3
-from botocore.exceptions import ClientError
+import yaml
 import logging
 import os
+import boto3
+from botocore.exceptions import ClientError
+from kafka import KafkaConsumer
+from json import loads
+
+# Get S3 bucket credential
+with open('config/s3_creds.yaml','r') as f:
+    s3_creds = yaml.safe_load(f)
 
 cluster_consumer = KafkaConsumer(
     "Pinterest_data",
@@ -14,7 +19,7 @@ cluster_consumer = KafkaConsumer(
     )
 
 cluster_consumer.subscribe(topics=["Pinterest_data"])
-
+ 
 def get_buckets_client():
     session = boto3.session.Session()
     # User can pass customized access key, secret_key and token as well
