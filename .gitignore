@@ -1,0 +1,5 @@
+# Ignore the myvenv directory
+myvenv/
+
+# Ignore yaml files
+*.yaml
