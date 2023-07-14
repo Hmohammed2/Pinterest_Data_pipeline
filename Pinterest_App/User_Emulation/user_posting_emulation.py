@@ -3,20 +3,23 @@ from time import sleep
 import random
 import sqlalchemy
 from sqlalchemy import text
+import yaml
 
+
+with open('config/aws_creds.yaml','r') as f:
+    aws_creds = yaml.safe_load(f)
 
 random.seed(100)
-
 
 class AWSDBConnector:
 
     def __init__(self):
 
-        self.HOST = "pinterestdbreadonly.cq2e8zno855e.eu-west-1.rds.amazonaws.com"
-        self.USER = 'project_user'
-        self.PASSWORD = ':t%;yCY3Yjg'
-        self.DATABASE = 'pinterest_data'
-        self.PORT = 3306
+        self.HOST = aws_creds['HOST']
+        self.USER = aws_creds['USER']
+        self.PASSWORD = aws_creds['PASSWORD']
+        self.DATABASE = aws_creds['DATABASE']
+        self.PORT = aws_creds['PORT']
         
     def create_db_connector(self):
         engine = sqlalchemy.create_engine(f"mysql+pymysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}?charset=utf8mb4")
