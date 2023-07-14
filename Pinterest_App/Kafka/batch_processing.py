@@ -37,7 +37,14 @@ hadoopConf.set('fs.s3a.access.key', access_key)
 hadoopConf.set('fs.s3a.secret.key', secret_access_key)
 hadoopConf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') 
 
-session = SparkSession(sc)
+session = SparkSession(sc).Builder().getOrCreate()
+
+def read_from_s3(session):
+    """Read data from s3 bucket"""
+    # Read from the S3 bucket
+    df = session.read.option("multiline","true").json('s3a://pinterest-data-bucket/*') 
+
+    return df
 
 def transform_data():
         """Do transformation on data using pyspark"""
@@ -80,3 +87,6 @@ def transform_data():
         df.show(500)
 
 
+if __name__ == "__main__":
+    data = read_from_s3(session)
+    print(data.show(10))
