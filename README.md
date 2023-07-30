@@ -71,7 +71,7 @@ kafka_producer = KafkaProducer(
     bootstrap_servers="localhost:9092",
     client_id="Pinterest data producer",
     value_serializer=lambda mlmessage: dumps(mlmessage).encode("ascii")
-) 
+) n
 
 
 @app.post("/pin/")
@@ -82,7 +82,40 @@ def get_db_row(item: Data):
 ```
 # 3. Batch Processing
 ## 3.1 Ingest data into the lake
+The first step would be to create an S3 bucket which can be done via the AWS console. Once an S3 bucket was created, a script will have to be created to ensure a kafka batch processing consumer can recieve the data from the topic to be stored into the S3 bucket. The code can be found in the batch_consumer.py
+```python
+cluster_consumer = KafkaConsumer(
+    "Pinterest_data",
+    bootstrap_servers = "localhost:9092",
+    value_deserializer = lambda message: loads(message),
+    auto_offset_reset = "earliest"
+    )
+
+cluster_consumer.subscribe(topics=["Pinterest_data"])
+ 
+s3_client = boto3.client("s3")
+
+print(s3_client.list_buckets())
+
+for message in cluster_consumer:
+    
+    json_object = json.dumps(message.value, indent=4)
+    unique_id = (message.value)["unique_id"]
+    filename = 'event-'+unique_id+'.json'
+    filepath = os.path.join('events',filename)
+    
+    s3_client.put_object(
+        Body=json_object,
+        Bucket = s3_creds['Bucket'],
+        Key = filepath)
+```
+Kafka-Python was used to extract the messages from the consumer.I then used boto3 to send the data received by the Kafka consumer to the S3 bucket created when it is consumed.
+Each event was saved as a JSON file.The data will be kept in S3 for long-term persistent storage, and wait to be processed all at once by Spark batch processing jobs either run periodically by Airflow.
+
+![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/S3-bucket.PNG)
+
 ## 3.2 Process data into Spark
+
 ## 3.3 Orchestrate the batch processing using Airflow
 
 # 4. Stream Processing
