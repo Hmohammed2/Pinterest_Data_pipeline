@@ -6,7 +6,11 @@ Every day Pinterest runs thousands of experiments to determine what features to 
 * [2. Data Ingestion](#2-Data-Ingestion)
     * [2.1 Configuring the API](#21-Configuring-the-API)
     * [2.2 Consuming the data into Kafka](#22-Consuming-the-data-into-Kafka)
-* [3. Batch processing](#3-Batch-Processing)
+* [3. Batch Processing](#3-Batch-Processing)
+   * [3.1 Ingest data into the lake](31-Ingest-data-into-the-lake)
+   * [3.2 Process data into Spark](32-Process-data-into-Spark)
+   * [3.3 Orchestrate the batch processing using Airflow](33-Orchestrate-the-batch-processing-using-Airflow)
+* [4. Stream Processing](#4-Stream-Processing)
 
 # 1. Project Overview
 As mentioned in the introduction, this project will involve replicating Pinterests end to end data processing pipeline in Python. It will be implemented based on Lambda architecture that utilises both batch and stream processing.
@@ -76,3 +80,9 @@ def get_db_row(item: Data):
     kafka_producer.send(topic="Pinterest_data", value=data)
     return item
 ```
+# 3. Batch Processing
+## 3.1 Ingest data into the lake
+## 3.2 Process data into Spark
+## 3.3 Orchestrate the batch processing using Airflow
+
+# 4. Stream Processing
