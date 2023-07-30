@@ -115,7 +115,9 @@ Each event was saved as a JSON file.The data will be kept in S3 for long-term pe
 ![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/S3-bucket.PNG)
 
 ## 3.2 Process data into Spark
+When processing data with Spark, we need to read data from different data sources, which in this case will be from our AWS S3 bucket. Therefore, this part first explains how to use pyspark to read data from AWS S3, and then use spark SQL for simple data processing. The code can be found in the batch_processing.py file.
 
 ## 3.3 Orchestrate the batch processing using Airflow
+
 
 # 4. Stream Processing
