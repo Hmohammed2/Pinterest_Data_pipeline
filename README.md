@@ -22,5 +22,54 @@ kafka-python- was used for as the client that allows for you to interact with Ap
 
 Kafka-Python can be simply installed using pip just run `pip install kafka-python`. Once installed you will need to start your Kafka Broker and Zookeeper to begin interacting with Kafka. This was done via the terminal ubuntu
 
-![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/zookeeper-start.png)
+![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/zookeeper-start.PNG)
 ![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/kafka-start.PNG)
+
+A topic was created which will be named "Pinterest_data".
+
+```python
+admin_client = KafkaAdminClient(
+    bootstrap_servers="localhost:9092",
+    client_id = "Kafka-Administrator"
+)
+
+topics = ["Pinterest_data"]
+
+def create_topics(topic_names):
+    existing_topic_list = KafkaConsumer().topics()
+    print(list(KafkaConsumer().topics()))
+    topic_list = []
+    for topic in topic_names:
+        if topic not in existing_topic_list:
+            print('Topic : {} added '.format(topic))
+            topic_list.append(NewTopic(name=topic, num_partitions=3, replication_factor=1))
+        else:
+            print('Topic : {topic} already exist ')
+    try:
+        if topic_list:
+            admin_client.create_topics(new_topics=topic_list, validate_only=False)
+            print("Topic Created Successfully")
+        else:
+            print("Topic Exist")
+    except TopicAlreadyExistsError as e:
+        print("Topic Already Exist")
+    except  Exception as e:
+        print(e)
+```
+We then create a Kafka producer which can be used to send messages into the topic. These messages will be sent via the API.
+
+```python
+# Create Producer to send message to a kafka topic
+kafka_producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    client_id="Pinterest data producer",
+    value_serializer=lambda mlmessage: dumps(mlmessage).encode("ascii")
+) 
+
+
+@app.post("/pin/")
+def get_db_row(item: Data):
+    data = dict(item)
+    kafka_producer.send(topic="Pinterest_data", value=data)
+    return item
+```
