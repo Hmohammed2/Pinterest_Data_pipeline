@@ -223,7 +223,8 @@ For streaming data, this project uses Spark Structured Streaming to consume data
 # Download spark sql kakfa package from Maven repository and submit to PySpark at runtime. 
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,org.postgresql:postgresql:42.5.0 pyspark-shell'
 ```
-```python``
+
+```python
 # Construct a streaming DataFrame that reads from topic
 stream_df = spark \
         .readStream \
@@ -238,5 +239,5 @@ We can then write the data we have retrieved from our topic into the local Postg
 ![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/schema.PNG)
 
 After initating the query on our data base SELECT unique_id, title FROM experimental_streaming. We can see that the data has successfully been stored into our local database.
-![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/Postgresql-query.PNG)
+![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/PostgreSQL-expression.PNG)
 
