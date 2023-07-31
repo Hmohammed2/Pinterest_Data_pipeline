@@ -7,9 +7,9 @@ Every day Pinterest runs thousands of experiments to determine what features to 
     * [2.1 Configuring the API](#21-Configuring-the-API)
     * [2.2 Consuming the data into Kafka](#22-Consuming-the-data-into-Kafka)
 * [3. Batch Processing](#3-Batch-Processing)
-   * [3.1 Ingest data into the lake](31-Ingest-data-into-the-lake)
-   * [3.2 Process data into Spark](32-Process-data-into-Spark)
-   * [3.3 Orchestrate the batch processing using Airflow](33-Orchestrate-the-batch-processing-using-Airflow)
+   * [3.1 Ingest data into the lake](#31-Ingest-data-into-the-lake)
+   * [3.2 Process data into Spark](#32-Process-data-into-Spark)
+   * [3.3 Orchestrate the batch processing using Airflow](#33-Orchestrate-the-batch-processing-using-Airflow)
 * [4. Stream Processing](#4-Stream-Processing)
 
 # 1. Project Overview
