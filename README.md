@@ -117,6 +117,81 @@ Each event was saved as a JSON file.The data will be kept in S3 for long-term pe
 ## 3.2 Process data into Spark
 When processing data with Spark, we need to read data from different data sources, which in this case will be from our AWS S3 bucket. Therefore, this part first explains how to use pyspark to read data from AWS S3, and then use spark SQL for simple data processing. The code can be found in the batch_processing.py file.
 
+We can start by first trying to integrate spark with AWS S3. This can be done by adding the appropriate application library (jars). The libraries contain the dependencies needed to act as connectors. They can be found on the Maven depository https://mvnrepository.com/ and are specified in the format groupId:artifactId:version.
+
+Once the library has been fully configured we can then configure the context (access ID and access key) in the SparkSession for authentication. For extra security the information is stored in a variable within a yaml file.
+```python
+cfg = (
+    pyspark.SparkConf()
+    # Setting the master to run locally and with the maximum amount of cpu coresfor multiprocessing.
+    .setMaster(f"local[{multiprocessing.cpu_count()}]")
+    # Setting application name
+    .setAppName("TestApp")
+    # Setting config value via string
+    .set("spark.eventLog.enabled", False)
+    # Setting environment variables for executors to use
+    .setExecutorEnv(pairs=[("VAR3", "value3"), ("VAR4", "value4")])
+    # Setting memory if this setting was not set previously
+    .setIfMissing("spark.executor.memory", "1g")
+)
+
+sc = pyspark.SparkContext(conf=cfg)
+
+access_key = s3_creds['aws_access_key_id']
+secret_access_key = s3_creds['aws_secret_access_key']
+
+hadoopConf = sc._jsc.hadoopConfiguration()
+hadoopConf.set('fs.s3a.access.key', access_key)
+hadoopConf.set('fs.s3a.secret.key', secret_access_key)
+hadoopConf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') 
+
+session = SparkSession(sc).Builder().getOrCreate()
+```
+
+The data can then be processed using Spark SQL module. Spark SQL lets you query structured data inside Spark programs, using either SQL or a familiar DataFrame API. Spark SQL operates through lazy evaluation which means Spark will not start the execution of the process until an ACTION is called. This has several advantages such as increased speed and reduced computation as there is less calculation overhead. 
+
+```python
+def transform_data(df):
+        """Do some transformation/cleaning on the data using pyspark.sql functions"""
+
+        # replace error or empty data with Nones
+        df = df.replace({'User Info Error': None}, subset = ['follower_count']) \
+                         .replace({'No description available Story format': None}, subset = ['description']) \
+                         .replace({'No description available': None}, subset = ['description']) \
+                         .replace({'Image src error.': None}, subset = ['image_src'])\
+                         .replace({'N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e': None}, subset = ['tag_list'])\
+                         .replace({'Image src error.': None}, subset = ['image_src'])\
+                         .replace({"No Title Data Available": None}, subset = ['title']) \
+        
+        # Convert the unit to corresponding zeros
+        df = df.withColumn("follower_count", when(col('follower_count').like("%k"), regexp_replace('follower_count', 'k', '000')) \
+                        .when(col('follower_count').like("%M"), regexp_replace('follower_count', 'M', '000000'))\
+                        .cast("int"))
+
+        # Convert the type into int
+        df= df.withColumn("downloaded", df["downloaded"].cast("int")) \
+                        .withColumn("index", ddf["index"].cast("int")) 
+        
+        # Rename the column
+        df = df.withColumnRenamed("index", "index_id")
+
+        # reorder columns
+        df = df.select('unique_id',
+                                'index_id',
+                                'title',
+                                'category',
+                                'description',
+                                'follower_count',
+                                'tag_list',
+                                'is_image_or_video',
+                                'image_src',
+                                'downloaded',
+                                'save_location'
+                                )
+    
+    # show the first 20 rows of data into the terminal
+        df.show(20)
+```
 ## 3.3 Orchestrate the batch processing using Airflow
 
 
