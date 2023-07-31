@@ -46,11 +46,11 @@ def read_from_s3(session):
 
     return df
 
-def transform_data():
-        """Do transformation on data using pyspark"""
+def transform_data(df):
+        """Do some transformation/cleaning on the data using pyspark.sql functions"""
 
         # replace error or empty data with Nones
-        df = df.replace({'User Info Error': None}, subset = ['follower_count','poster_name']) \
+        df = df.replace({'User Info Error': None}, subset = ['follower_count']) \
                          .replace({'No description available Story format': None}, subset = ['description']) \
                          .replace({'No description available': None}, subset = ['description']) \
                          .replace({'Image src error.': None}, subset = ['image_src'])\
@@ -64,8 +64,8 @@ def transform_data():
                         .cast("int"))
 
         # Convert the type into int
-        df= df.withColumn("downloaded", self.df["downloaded"].cast("int")) \
-                        .withColumn("index", self.df["index"].cast("int")) 
+        df= df.withColumn("downloaded", df["downloaded"].cast("int")) \
+                        .withColumn("index", ddf["index"].cast("int")) 
         
         # Rename the column
         df = df.withColumnRenamed("index", "index_id")
@@ -83,10 +83,11 @@ def transform_data():
                                 'downloaded',
                                 'save_location'
                                 )
-
-        df.show(500)
+    
+    # show the first 20 rows of data into the terminal
+        df.show(20)
 
 
 if __name__ == "__main__":
     data = read_from_s3(session)
-    print(data.show(10))
+    transform_data(data)
