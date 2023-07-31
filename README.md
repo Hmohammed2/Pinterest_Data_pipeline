@@ -193,6 +193,31 @@ def transform_data(df):
         df.show(20)
 ```
 ## 3.3 Orchestrate the batch processing using Airflow
+Apache Airflow is a task-orchestration tool that allows you to define a series of tasks to be executed in a specific order. The tasks can be run in a distributed manner using Airflow's scheduler.
 
+In Airflow you use Directed Acyclic Graphs (DAGs) to define a workflow. Each node in the DAG corresponds to a task, and they will be connected to one another.DaGS can be created via the Airflow UI or through a python script which we will be doing in the script spark_processing_jon.py. The DAG will periodically initiate both the scripts batch_consumer.py and batch_processing.py once a day at 10am.
 
+```python
+with DAG(dag_id='batch_processing',
+         default_args=default_args,
+         schedule='0 10 * * *',
+         catchup=False,
+         ) as dag:
+
+    batch_consume_task = BashOperator(
+        task_id='consume_batch_data',
+        bash_command=f'cd {work_dir} && python batch_consumer.py '
+    )
+    batch_process_task = BashOperator(
+        task_id='process_batch_data',
+        bash_command=f'cd {work_dir} && python batch_processing.py'
+    )
+
+    
+    batch_consume_task >> batch_process_task
+```
 # 4. Stream Processing
+For streaming data, this project uses Spark Structured Streaming to consume data from our Kafka topic in real time, then process the data, and finally send the streaming data into our local PostgreSQL database for storage.Similarly, Spark requires appropriate additional libraries (jars) and configuration information to integrate Kafka and PostgreSQL.The code can be found in the "stream_processing.py"
+
+
+
