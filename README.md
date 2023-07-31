@@ -219,5 +219,24 @@ with DAG(dag_id='batch_processing',
 # 4. Stream Processing
 For streaming data, this project uses Spark Structured Streaming to consume data from our Kafka topic in real time, then process the data, and finally send the streaming data into our local PostgreSQL database for storage.Similarly, Spark requires appropriate additional libraries (jars) and configuration information to integrate Kafka and PostgreSQL.The code can be found in the "stream_processing.py"
 
+```python
+# Download spark sql kakfa package from Maven repository and submit to PySpark at runtime. 
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,org.postgresql:postgresql:42.5.0 pyspark-shell'
+```
+```python``
+# Construct a streaming DataFrame that reads from topic
+stream_df = spark \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
+        .option("subscribe", kafka_topic_name) \
+        .option("startingOffsets", "earliest") \
+        .load()
+```
+We can then write the data we have retrieved from our topic into the local PostgreSQL database as shown in the screenshot below.
 
+![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/schema.PNG)
+
+After initating the query on our data base SELECT unique_id, title FROM experimental_streaming. We can see that the data has successfully been stored into our local database.
+![alt text](https://github.com/Hmohammed2/Pinterest_Data_pipeline/blob/main/images/Postgresql-query.PNG)
 
